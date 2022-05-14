@@ -14,6 +14,8 @@
 
 - VirtualBox
 ```bash
+root@main:/home/admin1/virt-homework/vagrant# vagrant up
+Bringing machine 'server1.netology' up with 'virtualbox' provider...
 
 ```
 - Vagrant
