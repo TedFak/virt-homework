@@ -26,9 +26,7 @@
 Для получения зачета, вам необходимо предоставить:
 - Скриншот страницы свойств созданной ВМ, как на примере ниже:
 
-<p align="center">
-  <img width="1200" height="600" src="./assets/yc_01.png">
-</p>
+![image](https://user-images.githubusercontent.com/95320903/168524189-2cde5c62-5e50-4af7-8cda-9500156b0cb7.png)
 
 ## Задача 3
 
@@ -36,9 +34,7 @@
 
 Для получения зачета, вам необходимо предоставить:
 - Скриншот работающего веб-интерфейса Grafana с текущими метриками, как на примере ниже
-<p align="center">
-  <img width="1200" height="600" src="./assets/yc_02.png">
-</p>
+![image](https://user-images.githubusercontent.com/95320903/168524171-0500af6b-99d0-4073-bb8f-5ee547c233f0.png)
 
 ## Задача 4 (*)
 
