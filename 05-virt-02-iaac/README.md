@@ -19,11 +19,9 @@ Bringing machine 'server1.netology' up with 'virtualbox' provider...
 
 Progress: 90%There was an error while executing `VBoxManage`, a CLI used by Vagrant
 for controlling VirtualBox. The command and stderr is shown below.
-
+```
 ![image](https://user-images.githubusercontent.com/95320903/168653383-36792a5f-9389-42c2-aeb1-6775691b5db4.png)
 
-
-```
 - Vagrant
 ```bash
 root@main:/home/admin1/virt-homework# vagrant -v
