@@ -41,5 +41,7 @@ ansible 2.9.6
 ## Задача 4 (*)
 
 ```bash
+vagrant@server1:~$ docker ps
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 
 ```
