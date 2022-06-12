@@ -53,23 +53,28 @@ Docker подойдет для использования, не хранят д�
 
 ## Задача 3
 
-- Запустите первый контейнер из образа ***centos*** c любым тэгом в фоновом режиме, подключив папку ```/data``` из текущей рабочей директории на хостовой машине в ```/data``` контейнера;
-- Запустите второй контейнер из образа ***debian*** в фоновом режиме, подключив папку ```/data``` из текущей рабочей директории на хостовой машине в ```/data``` контейнера;
-- Подключитесь к первому контейнеру с помощью ```docker exec``` и создайте текстовый файл любого содержания в ```/data```;
-- Добавьте еще один файл в папку ```/data``` на хостовой машине;
-- Подключитесь во второй контейнер и отобразите листинг и содержание файлов в ```/data``` контейнера.
-
-## Задача 4 (*)
-
-Воспроизвести практическую часть лекции самостоятельно.
-
-Соберите Docker образ с Ansible, загрузите на Docker Hub и пришлите ссылку вместе с остальными ответами к задачам.
-
-
----
-
-### Как cдавать задание
-
-Выполненное домашнее задание пришлите ссылкой на .md-файл в вашем репозитории.
-
----
+```bash
+root@server1:/home/vagrant# docker run -v /data:/data -ti centos bash
+Unable to find image 'centos:latest' locally
+latest: Pulling from library/centos
+a1d0c7532777: Pull complete 
+Digest: sha256:a27fd8080b517143cbbbab9dfb7c8571c40d67d534bbdee55bd6c473f432b177
+Status: Downloaded newer image for centos:latest
+[root@4a8b3a89c4c4 /]# cd data
+[root@4a8b3a89c4c4 data]# echo 'Im here to Centos' > ckeck_centos
+[root@4a8b3a89c4c4 data]# ls
+ckeck_centos
+root@server1:/home/vagrant# docker run -v /data:/data -ti debian bash
+Unable to find image 'debian:latest' locally
+latest: Pulling from library/debian
+e756f3fdd6a3: Pull complete 
+Digest: sha256:3f1d6c17773a45c97bd8f158d665c9709d7b29ed7917ac934086ad96f92e4510
+Status: Downloaded newer image for debian:latest
+root@39fe3995da84:/# cd data
+root@39fe3995da84:/data# echo 'Im here to Debian' > check_debian
+root@server1:/home/vagrant# cd /data
+root@server1:/data# vim check_host
+root@server1:/home/vagrant# docker run -v /data:/data -ti debian
+root@7d2acf3e288a:/# ls data
+check_debian  check_host  ckeck_centos
+```
