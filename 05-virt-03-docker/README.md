@@ -5,7 +5,7 @@
 
 ![image](https://user-images.githubusercontent.com/95320903/173230199-164e9343-130c-4613-a81a-8f08a43d1630.png)
 
-
+https://hub.docker.com/repository/docker/tedfak/nginx
 
 ## Задача 2
 
