@@ -2,7 +2,7 @@
 
 ## Задача 1
 
-![image](https://user-images.githubusercontent.com/95320903/173680846-c1507e89-5bf1-44a2-9f54-637458eae455.png)
+![image](https://user-images.githubusercontent.com/95320903/173693168-dd55789b-77ec-4a8b-b528-a7a5d257eebd.png)
 
 ## Задача 2
 
