@@ -7,10 +7,12 @@
 
 ## Задача 1
 
-Используя docker поднимите инстанс PostgreSQL (версию 12) c 2 volume, 
-в который будут складываться данные БД и бэкапы.
+```bash
+root@server1:/opt/stack# docker ps
 
-Приведите получившуюся команду или docker-compose манифест.
+CONTAINER ID   IMAGE         COMMAND                  CREATED          STATUS                         PORTS     NAMES
+c49faf6dbc1d   postgres:12   "docker-entrypoint.s…"   39 seconds ago   Restarting (1) 7 seconds ago             postgres
+```
 
 ## Задача 2
 
