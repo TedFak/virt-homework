@@ -7,7 +7,27 @@
 
 ## Задача 1
 
+
 ```bash
+root@server1:/opt/stack# cat docker-compose.yaml 
+version: "3.9"
+services:
+  db:
+    image: postgres:12
+    restart: always
+    container_name: postgres
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      PGDATA: /var/lib/postgresql/data/
+    volumes:
+    - db-data:/var/lib/postgresql/data
+    - db-backup:/var/lib/backup
+    network_mode: "host"
+
+volumes:
+  db-data:
+  db-backup:
 root@server1:/opt/stack# docker ps
 
 CONTAINER ID   IMAGE         COMMAND                  CREATED          STATUS                         PORTS     NAMES
@@ -16,29 +36,69 @@ c49faf6dbc1d   postgres:12   "docker-entrypoint.s…"   39 seconds ago   Restart
 
 ## Задача 2
 
-В БД из задачи 1: 
-- создайте пользователя test-admin-user и БД test_db
-- в БД test_db создайте таблицу orders и clients (спeцификация таблиц ниже)
-- предоставьте привилегии на все операции пользователю test-admin-user на таблицы БД test_db
-- создайте пользователя test-simple-user  
-- предоставьте пользователю test-simple-user права на SELECT/INSERT/UPDATE/DELETE данных таблиц БД test_db
-
-Таблица orders:
-- id (serial primary key)
-- наименование (string)
-- цена (integer)
-
-Таблица clients:
-- id (serial primary key)
-- фамилия (string)
-- страна проживания (string, index)
-- заказ (foreign key orders)
-
-Приведите:
 - итоговый список БД после выполнения пунктов выше,
+```bash
+test_db=# \l
+                                 List of databases
+   Name    |  Owner   | Encoding |  Collate   |   Ctype    |   Access privileges   
+-----------+----------+----------+------------+------------+-----------------------
+ postgres  | postgres | UTF8     | en_US.utf8 | en_US.utf8 | 
+ template0 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+           |          |          |            |            | postgres=CTc/postgres
+ template1 | postgres | UTF8     | en_US.utf8 | en_US.utf8 | =c/postgres          +
+           |          |          |            |            | postgres=CTc/postgres
+ test_db   | postgres | UTF8     | en_US.utf8 | en_US.utf8 | 
+(4 rows)
+```
 - описание таблиц (describe)
+```bash
+test_db=# \d+
+                       List of relations
+ Schema |  Name   | Type  |  Owner   |    Size    | Description 
+--------+---------+-------+----------+------------+-------------
+ public | clients | table | postgres | 8192 bytes | 
+ public | orders  | table | postgres | 8192 bytes | 
+(2 rows)
+```
 - SQL-запрос для выдачи списка пользователей с правами над таблицами test_db
+```bash
+test_db=# SELECT * FROM information_schema.table_privileges WHERE grantee IN ('test-admin-user','test-simple-user'); 
+ grantor  |     grantee      | table_catalog | table_schema | table_name | privilege_type | is_grantable | with_hierarchy 
+----------+------------------+---------------+--------------+------------+----------------+--------------+----------------
+ postgres | test-admin-user  | test_db       | public       | orders     | INSERT         | NO           | NO
+ postgres | test-admin-user  | test_db       | public       | orders     | SELECT         | NO           | YES
+ postgres | test-admin-user  | test_db       | public       | orders     | UPDATE         | NO           | NO
+ postgres | test-admin-user  | test_db       | public       | orders     | DELETE         | NO           | NO
+ postgres | test-admin-user  | test_db       | public       | orders     | TRUNCATE       | NO           | NO
+ postgres | test-admin-user  | test_db       | public       | orders     | REFERENCES     | NO           | NO
+ postgres | test-admin-user  | test_db       | public       | orders     | TRIGGER        | NO           | NO
+ postgres | test-simple-user | test_db       | public       | orders     | INSERT         | NO           | NO
+ postgres | test-simple-user | test_db       | public       | orders     | SELECT         | NO           | YES
+ postgres | test-simple-user | test_db       | public       | orders     | UPDATE         | NO           | NO
+ postgres | test-simple-user | test_db       | public       | orders     | DELETE         | NO           | NO
+ postgres | test-admin-user  | test_db       | public       | clients    | INSERT         | NO           | NO
+ postgres | test-admin-user  | test_db       | public       | clients    | SELECT         | NO           | YES
+ postgres | test-admin-user  | test_db       | public       | clients    | UPDATE         | NO           | NO
+ postgres | test-admin-user  | test_db       | public       | clients    | DELETE         | NO           | NO
+ postgres | test-admin-user  | test_db       | public       | clients    | TRUNCATE       | NO           | NO
+ postgres | test-admin-user  | test_db       | public       | clients    | REFERENCES     | NO           | NO
+ postgres | test-admin-user  | test_db       | public       | clients    | TRIGGER        | NO           | NO
+ postgres | test-simple-user | test_db       | public       | clients    | INSERT         | NO           | NO
+ postgres | test-simple-user | test_db       | public       | clients    | SELECT         | NO           | YES
+ postgres | test-simple-user | test_db       | public       | clients    | UPDATE         | NO           | NO
+ postgres | test-simple-user | test_db       | public       | clients    | DELETE         | NO           | NO
+(22 rows)
+```
 - список пользователей с правами над таблицами test_db
+```bash
+test_db=# \du+
+                                              List of roles
+    Role name     |                         Attributes                         | Member of | Description 
+------------------+------------------------------------------------------------+-----------+-------------
+ postgres         | Superuser, Create role, Create DB, Replication, Bypass RLS | {}        | 
+ test-admin-user  |                                                            | {}        | 
+ test-simple-user |
+```
 
 ## Задача 3
 
