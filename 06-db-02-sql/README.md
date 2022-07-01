@@ -35,7 +35,6 @@ c49faf6dbc1d   postgres:12   "docker-entrypoint.s…"   39 seconds ago   Restart
 ```
 
 ## Задача 2
-
 - итоговый список БД после выполнения пунктов выше,
 ```bash
 test_db=# \l
@@ -102,75 +101,64 @@ test_db=# \du+
 
 ## Задача 3
 
-Используя SQL синтаксис - наполните таблицы следующими тестовыми данными:
+```bash
+test_db=# insert into orders VALUES (1, 'Шоколад', 10), (2, 'Принтер', 3000), (3, 'Книга', 500), (4, 'Монитор', 7000), (5, 'Гитара', 4000);
+INSERT 0 5
+test_db=# insert into clients VALUES (1, 'Иванов Иван Иванович', 'USA'), (2, 'Петров Петр Петрович', 'Canada'), (3, 'Иоганн Себастьян Бах', 'Japan'), (4, 'Ронни Джеймс Дио', 'Russia'), (5, 'Ritchie Blackmore', 'Russia');
+INSERT 0 5
+test_db=# select count (*) from orders;
+ count 
+-------
+     5
+(1 row)
 
-Таблица orders
+test_db=# select count (*) from clients;
+ count 
+-------
+     5
+(1 row)
 
-|Наименование|цена|
-|------------|----|
-|Шоколад| 10 |
-|Принтер| 3000 |
-|Книга| 500 |
-|Монитор| 7000|
-|Гитара| 4000|
-
-Таблица clients
-
-|ФИО|Страна проживания|
-|------------|----|
-|Иванов Иван Иванович| USA |
-|Петров Петр Петрович| Canada |
-|Иоганн Себастьян Бах| Japan |
-|Ронни Джеймс Дио| Russia|
-|Ritchie Blackmore| Russia|
-
-Используя SQL синтаксис:
-- вычислите количество записей для каждой таблицы 
-- приведите в ответе:
-    - запросы 
-    - результаты их выполнения.
-
+```
 ## Задача 4
 
-Часть пользователей из таблицы clients решили оформить заказы из таблицы orders.
-
-Используя foreign keys свяжите записи из таблиц, согласно таблице:
-
-|ФИО|Заказ|
-|------------|----|
-|Иванов Иван Иванович| Книга |
-|Петров Петр Петрович| Монитор |
-|Иоганн Себастьян Бах| Гитара |
-
-Приведите SQL-запросы для выполнения данных операций.
-
-Приведите SQL-запрос для выдачи всех пользователей, которые совершили заказ, а также вывод данного запроса.
- 
-Подсказк - используйте директиву `UPDATE`.
+```bash
+test_db=# update  clients set booking = 3 where id = 1;
+UPDATE 1
+test_db=# update  clients set booking = 4 where id = 2;
+UPDATE 1
+test_db=# update  clients set booking = 5 where id = 3;
+UPDATE 1
+test_db=# select * from clients where booking is not null;
+ id |       lastname       | country | booking 
+----+----------------------+---------+---------
+  1 | Иванов Иван Иванович | USA     |       3
+  2 | Петров Петр Петрович | Canada  |       4
+  3 | Иоганн Себастьян Бах | Japan   |       5
+(3 rows)
+```
 
 ## Задача 5
 
-Получите полную информацию по выполнению запроса выдачи всех пользователей из задачи 4 
-(используя директиву EXPLAIN).
-
-Приведите получившийся результат и объясните что значат полученные значения.
+```bash
+test_db=# EXPLAIN SELECT * from clients WHERE booking is not NULL;
+                        QUERY PLAN                         
+-----------------------------------------------------------
+ Seq Scan on clients  (cost=0.00..18.10 rows=806 width=72)
+   Filter: (booking IS NOT NULL)
+(2 rows)
+```
+```
+Показывает время на выполнения запросов.
+```
 
 ## Задача 6
 
-Создайте бэкап БД test_db и поместите его в volume, предназначенный для бэкапов (см. Задачу 1).
-
-Остановите контейнер с PostgreSQL (но не удаляйте volumes).
-
-Поднимите новый пустой контейнер с PostgreSQL.
-
-Восстановите БД test_db в новом контейнере.
-
-Приведите список операций, который вы применяли для бэкапа данных и восстановления. 
-
----
-
-### Как cдавать задание
-
-Выполненное домашнее задание пришлите ссылкой на .md-файл в вашем репозитории.
-
----
+```bash
+root@server1:/# pg_dumpall -U postgres >/var/lib/backup/backup.dmp
+root@server1:/opt/stack# docker-compose down
+Removing postgres ... done
+root@server1:/opt/stack# docker volume rm  stack_db-data
+stack_db-data
+root@server1:/opt/stack# docker-compose up
+root@server1:/# psql -U postgres /var/lib/backup/backup.dmp
+```
