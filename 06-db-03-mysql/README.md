@@ -138,21 +138,8 @@ mysql> SHOW PROFILES;
 ```
 ## Задача 4 
 
-Изучите файл `my.cnf` в директории /etc/mysql.
-
-Измените его согласно ТЗ (движок InnoDB):
-- Скорость IO важнее сохранности данных
-- Нужна компрессия таблиц для экономии места на диске
-- Размер буффера с незакомиченными транзакциями 1 Мб
-- Буффер кеширования 30% от ОЗУ
-- Размер файла логов операций 100 Мб
-
 Приведите в ответе измененный файл `my.cnf`.
 ```bash
-bash-4.4# cat /etc/my.cnf
-# For advice on how to change settings please see
-# http://dev.mysql.com/doc/refman/8.0/en/server-configuration-defaults.html
-
 [mysqld]
 datadir=/var/lib/mysql
 socket=/var/run/mysqld/mysqld.sock
