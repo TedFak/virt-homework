@@ -1,10 +1,5 @@
 # Домашнее задание к занятию "6.3. MySQL"
 
-## Введение
-
-Перед выполнением задания вы можете ознакомиться с 
-[дополнительными материалами](https://github.com/netology-code/virt-homeworks/tree/master/additional/README.md).
-
 ## Задача 1
 
 Используя docker поднимите инстанс MySQL (версию 8). Данные БД сохраните в volume.
@@ -117,15 +112,30 @@ mysql> select * from INFORMATION_SCHEMA.USER_ATTRIBUTES where user = 'test';
 ```
 ## Задача 3
 
-Установите профилирование `SET profiling = 1`.
-Изучите вывод профилирования команд `SHOW PROFILES;`.
-
 Исследуйте, какой `engine` используется в таблице БД `test_db` и **приведите в ответе**.
-
+```bash
+mysql> SELECT TABLE_SCHEMA, TABLE_NAME, ENGINE FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'test_db';
++--------------+------------+--------+
+| TABLE_SCHEMA | TABLE_NAME | ENGINE |
++--------------+------------+--------+
+| test_db      | orders     | InnoDB |
++--------------+------------+--------+
+1 row in set (0.00 sec)
+```
 Измените `engine` и **приведите время выполнения и запрос на изменения из профайлера в ответе**:
 - на `MyISAM`
 - на `InnoDB`
-
+```bash
+mysql> SHOW PROFILES;
++----------+------------+-------------------------------------------------------------------------------------------------------+
+| Query_ID | Duration   | Query                                                                                                 |
++----------+------------+-------------------------------------------------------------------------------------------------------+
+|        1 | 0.00098900 | SELECT TABLE_SCHEMA, TABLE_NAME, ENGINE FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'test_db' |
+|        2 | 0.09525575 | ALTER TABLE orders ENGINE = MyISAM                                                                    |
+|        3 | 0.04650625 | ALTER TABLE orders ENGINE = InnoDB                                                                    |
++----------+------------+-------------------------------------------------------------------------------------------------------+
+3 rows in set, 1 warning (0.00 sec)
+```
 ## Задача 4 
 
 Изучите файл `my.cnf` в директории /etc/mysql.
@@ -138,11 +148,27 @@ mysql> select * from INFORMATION_SCHEMA.USER_ATTRIBUTES where user = 'test';
 - Размер файла логов операций 100 Мб
 
 Приведите в ответе измененный файл `my.cnf`.
+```bash
+bash-4.4# cat /etc/my.cnf
+# For advice on how to change settings please see
+# http://dev.mysql.com/doc/refman/8.0/en/server-configuration-defaults.html
 
----
+[mysqld]
+datadir=/var/lib/mysql
+socket=/var/run/mysqld/mysqld.sock
+secure-file-priv=NULL
+user=mysql
 
-### Как оформить ДЗ?
+pid-file=/var/run/mysqld/mysqld.pid
 
-Выполненное домашнее задание пришлите ссылкой на .md-файл в вашем репозитории.
+innodb_flush_log_at_trx_commit = 0 
+innodb_file_format=Barracuda
+innodb_log_buffer_size = 1M
+innodb_buffer_pool_size = 3068M
+innodb_log_file_size = 100M
+[client]
+socket=/var/run/mysqld/mysqld.sock
 
----
+!includedir /etc/mysql/conf.d/
+```
+
