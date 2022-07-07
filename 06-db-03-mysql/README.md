@@ -99,21 +99,22 @@ mysql> select count(*) from orders where price>300;
 ```
 
 ## Задача 2
-
-Создайте пользователя test в БД c паролем test-pass, используя:
-- плагин авторизации mysql_native_password
-- срок истечения пароля - 180 дней 
-- количество попыток авторизации - 3 
-- максимальное количество запросов в час - 100
-- аттрибуты пользователя:
-    - Фамилия "Pretty"
-    - Имя "James"
-
-Предоставьте привелегии пользователю `test` на операции SELECT базы `test_db`.
-    
+ Предоставьте привелегии пользователю test на операции SELECT базы test_db.
+ ```bash
+ mysql> grant select on test_db.* to 'test'@'localhost';
+Query OK, 0 rows affected, 1 warning (0.02 sec)
+ ```
 Используя таблицу INFORMATION_SCHEMA.USER_ATTRIBUTES получите данные по пользователю `test` и 
 **приведите в ответе к задаче**.
-
+```bash
+mysql> select * from INFORMATION_SCHEMA.USER_ATTRIBUTES where user = 'test';
++------+-----------+---------------------------------------+
+| USER | HOST      | ATTRIBUTE                             |
++------+-----------+---------------------------------------+
+| test | localhost | {"fname": "James", "lname": "Pretty"} |
++------+-----------+---------------------------------------+
+1 row in set (0.02 sec)
+```
 ## Задача 3
 
 Установите профилирование `SET profiling = 1`.
