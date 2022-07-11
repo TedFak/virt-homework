@@ -19,7 +19,7 @@
 ## Задача 2
 
 **Приведите в ответе** команду, которую вы использовали для вычисления и полученный результат.
-```python
+```bash
 test_database=# select attname, avg_width from pg_stats where tablename='orders';
  attname | avg_width 
 ---------+-----------
@@ -30,21 +30,38 @@ test_database=# select attname, avg_width from pg_stats where tablename='orders'
 ```
 ## Задача 3
 
-Архитектор и администратор БД выяснили, что ваша таблица orders разрослась до невиданных размеров и
-поиск по ней занимает долгое время. Вам, как успешному выпускнику курсов DevOps в нетологии предложили
-провести разбиение таблицы на 2 (шардировать на orders_1 - price>499 и orders_2 - price<=499).
-
 Предложите SQL-транзакцию для проведения данной операции.
-
-Можно ли было изначально исключить "ручное" разбиение при проектировании таблицы orders?
 ```bash
-
+test_database=# CREATE TABLE orders_1 (LIKE orders);
+CREATE TABLE
+test_database=# CREATE TABLE orders_2 (LIKE orders);
+CREATE TABLE
+test_database=# INSERT INTO orders_1 SELECT * FROM orders WHERE price > 499;
+INSERT 0 3
+test_database=# DELETE FROM orders WHERE price > 499;
+DELETE 3
+test_database=# 
+test_database=# INSERT INTO orders_2 SELECT * FROM orders WHERE price <= 499;
+INSERT 0 5
+test_database=# DELETE FROM orders WHERE price <= 499;
+DELETE 5
+```
+Можно ли было изначально исключить "ручное" разбиение при проектировании таблицы orders?
+```
+Да, при проектирование таблицы надо было сделать сразу секционированние.
 ```
 ## Задача 4
 
 Используя утилиту `pg_dump` создайте бекап БД `test_database`.
+```bash
+postgres@15f403725740:~$ pg_dump -d test_database >/var/lib/postgresql/test1_dump.sql
+```
 
 Как бы вы доработали бэкап-файл, чтобы добавить уникальность значения столбца `title` для таблиц `test_database`?
-```bash
-
+```python
+CREATE TABLE public.orders (
+    id  integer NOT NULL,
+    title integer UNIQUE,
+    price numeric NOT NULL CHECK (price > 0),
+);
 ```
