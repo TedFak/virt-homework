@@ -20,8 +20,35 @@
 
 В ответе приведите:
 - текст Dockerfile манифеста
+```bash
+# Elasticsearch
+
+FROM centos:7
+
+RUN groupadd -g 1000 elasticsearch && useradd elasticsearch -u 1000 -g 1000
+
+RUN yum update -y
+RUN yum install java-11-openjdk -y
+RUN yum install wget -y
+RUN yum install perl-Digest-SHA -y
+
+RUN wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-8.3.2-linux-x86_64.tar.gz && \
+    wget https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-8.3.2-linux-x86_64.tar.gz.sha512
+
+RUN shasum -a 512 -c elasticsearch-8.3.2-linux-x86_64.tar.gz.sha512 && \
+    tar -xzf elasticsearch-8.3.2-linux-x86_64.tar.gz
+
+WORKDIR /var/lib/elasticsearch
+
+COPY elasticsearch.yml /var/lib/elasticsearch/config/
+```
 - ссылку на образ в репозитории dockerhub
+https://hub.docker.com/repository/docker/tedfak/elastic
 - ответ `elasticsearch` на запрос пути `/` в json виде
+```bash
+
+```
+
 
 Подсказки:
 - возможно вам понадобится установка пакета perl-Digest-SHA для корректной работы пакета shasum
