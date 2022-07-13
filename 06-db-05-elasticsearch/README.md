@@ -43,7 +43,9 @@ WORKDIR /var/lib/elasticsearch
 COPY elasticsearch.yml /var/lib/elasticsearch/config/
 ```
 - ссылку на образ в репозитории dockerhub
+
 https://hub.docker.com/repository/docker/tedfak/elastic
+
 - ответ `elasticsearch` на запрос пути `/` в json виде
 ```bash
 
