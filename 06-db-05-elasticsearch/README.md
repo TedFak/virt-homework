@@ -2,22 +2,6 @@
 
 ## Задача 1
 
-В этом задании вы потренируетесь в:
-- установке elasticsearch
-- первоначальном конфигурировании elastcisearch
-- запуске elasticsearch в docker
-
-Используя докер образ [centos:7](https://hub.docker.com/_/centos) как базовый и 
-[документацию по установке и запуску Elastcisearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/targz.html):
-
-- составьте Dockerfile-манифест для elasticsearch
-- соберите docker-образ и сделайте `push` в ваш docker.io репозиторий
-- запустите контейнер из получившегося образа и выполните запрос пути `/` c хост-машины
-
-Требования к `elasticsearch.yml`:
-- данные `path` должны сохраняться в `/var/lib`
-- имя ноды должно быть `netology_test`
-
 В ответе приведите:
 - текст Dockerfile манифеста
 ```bash
@@ -48,52 +32,90 @@ https://hub.docker.com/repository/docker/tedfak/elastic
 
 - ответ `elasticsearch` на запрос пути `/` в json виде
 ```bash
-
+[elasticsearch@a22c41bb4726 elasticsearch-8.3.2]$ curl -u elastic --insecure -X GET https://localhost:9200/
+Enter host password for user 'elastic':
+{
+  "name" : "a22c41bb4726",
+  "cluster_name" : "netology_test",
+  "cluster_uuid" : "K4_3QHx-SAC8MVI74zR_4A",
+  "version" : {
+    "number" : "8.3.2",
+    "build_type" : "tar",
+    "build_hash" : "8b0b1f23fbebecc3c88e4464319dea8989f374fd",
+    "build_date" : "2022-07-06T15:15:15.901688194Z",
+    "build_snapshot" : false,
+    "lucene_version" : "9.2.0",
+    "minimum_wire_compatibility_version" : "7.17.0",
+    "minimum_index_compatibility_version" : "7.0.0"
+  },
+  "tagline" : "You Know, for Search"
+}
 ```
-
-
-Подсказки:
-- возможно вам понадобится установка пакета perl-Digest-SHA для корректной работы пакета shasum
-- при сетевых проблемах внимательно изучите кластерные и сетевые настройки в elasticsearch.yml
-- при некоторых проблемах вам поможет docker директива ulimit
-- elasticsearch в логах обычно описывает проблему и пути ее решения
-
-Далее мы будем работать с данным экземпляром elasticsearch.
-
 ## Задача 2
-
-В этом задании вы научитесь:
-- создавать и удалять индексы
-- изучать состояние кластера
-- обосновывать причину деградации доступности данных
-
-Ознакомтесь с [документацией](https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html) 
-и добавьте в `elasticsearch` 3 индекса, в соответствии со таблицей:
+Добавьте в `elasticsearch` 3 индекса, в соответствии со таблицей:
 
 | Имя | Количество реплик | Количество шард |
 |-----|-------------------|-----------------|
 | ind-1| 0 | 1 |
 | ind-2 | 1 | 2 |
 | ind-3 | 2 | 4 |
-
+```bash
+[elasticsearch@d68215b80095 elasticsearch]$ curl -k --insecure -X PUT "http://localhost:9200/ind-1" -H 'Content-Type: application/json' -d'{ "settings": { "number_of_shards": 1,  "number_of_replicas": 0 }}'
+{"acknowledged":true,"shards_acknowledged":true,"index":"ind-1"}[elasticsearch@d68215b80095 elasticsearch]$ 
+[elasticsearch@d68215b80095 elasticsearch]$ curl -k --insecure -X PUT "http://localhost:9200/ind-2" -H 'Content-Type: application/json' -d'{ "settings": { "number_of_shards": 2,  "number_of_replicas": 1 }}'
+{"acknowledged":true,"shards_acknowledged":true,"index":"ind-2"}[elasticsearch@d68215b80095 elasticsearch]$ 
+[elasticsearch@d68215b80095 elasticsearch]$ curl -k --insecure -X PUT "http://localhost:9200/ind-3" -H 'Content-Type: application/json' -d'{ "settings": { "number_of_shards": 4,  "number_of_replicas": 2 }}'
+{"acknowledged":true,"shards_acknowledged":true,"index":"ind-3"}[elasticsearch@d68215b80095 elasticsearch]$ 
+```
 Получите список индексов и их статусов, используя API и **приведите в ответе** на задание.
-
+```bash
+[elasticsearch@d68215b80095 elasticsearch]$ curl -X GET "http://localhost:9200/_cat/indices?v"
+health status index uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+green  open   ind-1 Hd5zL8hhTe-UoFoQHd5lNg   1   0          0            0       225b           225b
+yellow open   ind-2 FFA1lVbVQ3a8V2zv2o8DhA   2   1          0            0       450b           450b
+yellow open   ind-3 sSNLXOgLQH-N5yEt9UJjDA   4   2          0            0       900b           900b
+```
 Получите состояние кластера `elasticsearch`, используя API.
-
+```bash
+[elasticsearch@d68215b80095 elasticsearch]$ curl --insecure -X GET http://localhost:9200/_cluster/health/?pretty=true
+{
+  "cluster_name" : "netology_test",
+  "status" : "yellow",
+  "timed_out" : false,
+  "number_of_nodes" : 1,
+  "number_of_data_nodes" : 1,
+  "active_primary_shards" : 8,
+  "active_shards" : 8,
+  "relocating_shards" : 0,
+  "initializing_shards" : 0,
+  "unassigned_shards" : 10,
+  "delayed_unassigned_shards" : 0,
+  "number_of_pending_tasks" : 0,
+  "number_of_in_flight_fetch" : 0,
+  "task_max_waiting_in_queue_millis" : 0,
+  "active_shards_percent_as_number" : 44.44444444444444
+}
+```
 Как вы думаете, почему часть индексов и кластер находится в состоянии yellow?
-
+```
+Потому что нет реплик, только один хост и другие шарды  в состоянии unassigned.
+```
 Удалите все индексы.
-
-**Важно**
-
-При проектировании кластера elasticsearch нужно корректно рассчитывать количество реплик и шард,
-иначе возможна потеря данных индексов, вплоть до полной, при деградации системы.
-
+```bash
+[elasticsearch@d68215b80095 elasticsearch]$ curl --insecure -X DELETE "http://localhost:9200/ind-1?pretty"
+{
+  "acknowledged" : true
+}
+[elasticsearch@d68215b80095 elasticsearch]$ curl --insecure -X DELETE "http://localhost:9200/ind-2?pretty"
+{
+  "acknowledged" : true
+}
+[elasticsearch@d68215b80095 elasticsearch]$ curl --insecure -X DELETE "http://localhost:9200/ind-3?pretty"
+{
+  "acknowledged" : true
+}
+```
 ## Задача 3
-
-В данном задании вы научитесь:
-- создавать бэкапы данных
-- восстанавливать индексы из бэкапов
 
 Создайте директорию `{путь до корневой директории с elasticsearch в образе}/snapshots`.
 
