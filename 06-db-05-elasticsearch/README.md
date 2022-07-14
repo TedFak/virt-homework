@@ -118,33 +118,55 @@ yellow open   ind-3 sSNLXOgLQH-N5yEt9UJjDA   4   2          0            0      
 ## Задача 3
 
 Создайте директорию `{путь до корневой директории с elasticsearch в образе}/snapshots`.
-
+```
+path.repo: /var/lib/elasticsearch/snapshots добавил в elasticsearch.yml
+```
 Используя API [зарегистрируйте](https://www.elastic.co/guide/en/elasticsearch/reference/current/snapshots-register-repository.html#snapshots-register-repository) 
 данную директорию как `snapshot repository` c именем `netology_backup`.
 
 **Приведите в ответе** запрос API и результат вызова API для создания репозитория.
-
+```bash
+[elasticsearch@47c9b6d65547 elasticsearch-8.3.2]$ curl --insecure -X PUT http://localhost:9200/_snapshot/netology_backup?pretty -H 'Content-Type: application/json' -d' { "type": "fs", "settings": { "location": "/var/lib/elasticsearch/snapshots"}}'
+{
+  "acknowledged" : true
+}
+```
 Создайте индекс `test` с 0 реплик и 1 шардом и **приведите в ответе** список индексов.
-
+```bash
+[elasticsearch@47c9b6d65547 elasticsearch-8.3.2]$ curl --insecure -X GET http://localhost:9200/_cat/indices?v
+health status index uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+green  open   test  XU7TTK_fTJ-8qvitDIQauQ   1   0          0            0       225b           225b
+```
 [Создайте `snapshot`](https://www.elastic.co/guide/en/elasticsearch/reference/current/snapshots-take-snapshot.html) 
 состояния кластера `elasticsearch`.
 
 **Приведите в ответе** список файлов в директории со `snapshot`ами.
-
+```bash
+[elasticsearch@47c9b6d65547 elasticsearch-8.3.2]$ ll /var/lib/elasticsearch/snapshots/
+total 36
+-rw-rw-r-- 1 elasticsearch elasticsearch   846 Jul 14 16:25 index-0
+-rw-rw-r-- 1 elasticsearch elasticsearch     8 Jul 14 16:25 index.latest
+drwxrwxr-x 4 elasticsearch elasticsearch  4096 Jul 14 16:25 indices
+-rw-rw-r-- 1 elasticsearch elasticsearch 18459 Jul 14 16:25 meta-7ZEwcDyjQ9e1kqgs1B9kPg.dat
+-rw-rw-r-- 1 elasticsearch elasticsearch   359 Jul 14 16:25 snap-7ZEwcDyjQ9e1kqgs1B9kPg.dat
+```
 Удалите индекс `test` и создайте индекс `test-2`. **Приведите в ответе** список индексов.
-
+```bash
+[elasticsearch@47c9b6d65547 elasticsearch-8.3.2]$ curl --insecure -X GET http://localhost:9200/_cat/indices?v
+health status index  uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+green  open   test-2 k-rB5oqfRNyeRm009Zoq5Q   1   0          0            0       225b           225b
+```
 [Восстановите](https://www.elastic.co/guide/en/elasticsearch/reference/current/snapshots-restore-snapshot.html) состояние
 кластера `elasticsearch` из `snapshot`, созданного ранее. 
 
 **Приведите в ответе** запрос к API восстановления и итоговый список индексов.
-
-Подсказки:
-- возможно вам понадобится доработать `elasticsearch.yml` в части директивы `path.repo` и перезапустить `elasticsearch`
-
----
-
-### Как cдавать задание
-
-Выполненное домашнее задание пришлите ссылкой на .md-файл в вашем репозитории.
-
----
+```bash
+[elasticsearch@47c9b6d65547 elasticsearch-8.3.2]$ curl --insecure -X POST http://localhost:9200/_snapshot/netology_backup/elasticsearch/_restore
+{"accepted":true}
+```
+```bash
+[elasticsearch@47c9b6d65547 elasticsearch-8.3.2]$ curl --insecure -X GET http://localhost:9200/_cat/indices?v
+health status index  uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+green  open   test-2 k-rB5oqfRNyeRm009Zoq5Q   1   0          0            0       225b           225b
+green  open   test   g27Im0d8QNSAyfj2mbHWrg   1   0          0            0       225b           225b
+```
